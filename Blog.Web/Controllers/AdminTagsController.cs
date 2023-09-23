@@ -16,7 +16,6 @@ namespace Blog.Web.Controllers
             _tagRepository = tagRepository;
         }
 
-
         [HttpGet]
         public IActionResult Add()
         {
@@ -51,11 +50,7 @@ namespace Blog.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var tag = new Tag
-            {
-                ID = id,
-                N
-            } 
+            var tag = await _tagRepository.GetAsync(id);
 
             if (tag != null)
             {
@@ -80,33 +75,25 @@ namespace Blog.Web.Controllers
                 DisplayName = editTagRequest.DisplayName,
             };
 
-            var existingTag = await _blogDbContext.Tags.FindAsync(tag.ID);
-
-            if (existingTag != null)
+            var updatedTag = await _tagRepository.UpdateAsync(tag);
+            if(updatedTag != null)
             {
-                existingTag.Name = tag.Name;
-                existingTag.DisplayName = tag.DisplayName;
-               await _blogDbContext.SaveChangesAsync();
-
                 //Show Success Notification
-                return RedirectToAction("Edit", new { id = editTagRequest.ID });
             }
             else
             {
                 //Show Error Notification
-                return RedirectToAction("Edit", new { id = editTagRequest.ID});
             }
+            return RedirectToAction("Edit", new { id = editTagRequest.ID});
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(EditTagRequest editTagRequest)
         {
-            var existingTag = await _blogDbContext.Tags.FindAsync(editTagRequest.ID);
-            if (existingTag != null)
+            var deletedTag = await _tagRepository.DeleteAsync(editTagRequest.ID);
+            if(deletedTag != null)
             {
-                _blogDbContext.Tags.Remove(existingTag);
-                await _blogDbContext.SaveChangesAsync();
-                //Show Succes Notification
+                //Show Success Notification
                 return RedirectToAction("List");
             }
             else

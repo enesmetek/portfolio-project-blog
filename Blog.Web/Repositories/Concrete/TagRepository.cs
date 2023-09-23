@@ -1,5 +1,6 @@
 ﻿using Blog.Web.Data;
 using Blog.Web.Models.Domain;
+using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +19,10 @@ namespace Blog.Web.Repositories.Concrete
         {
             return await _blogDbContext.Tags.ToListAsync();
         }
-        public Task<Tag?> GetAsync(Guid id)
+        public async Task<Tag?> GetAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var tag = await _blogDbContext.Tags.FindAsync(id);
+            return tag;
         }
         public async Task<Tag> AddAsync(Tag tag)
         {
@@ -34,17 +36,28 @@ namespace Blog.Web.Repositories.Concrete
 
             if(existingTag != null)
             {
-                existingTag.ID = tag.ID;
                 existingTag.Name = tag.Name;
+                existingTag.DisplayName = tag.DisplayName;
                 await _blogDbContext.SaveChangesAsync();
                 return existingTag;
             }
             return null;
-
         }
-        public Task<Tag?> DeleteAsync(Guid id)
+        public async Task<Tag?> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var existingTag = await _blogDbContext.Tags.FindAsync(id);
+            if (existingTag != null)
+            {
+                _blogDbContext.Tags.Remove(existingTag);
+                await _blogDbContext.SaveChangesAsync();
+                //Show Success Notification
+                return existingTag;
+            }
+            else
+            {
+                //Show Error Notification
+                return null;
+            }
         }
     }
 }
