@@ -2,9 +2,9 @@
 
 namespace Blog.Web.Repositories.Abstract
 {
-    public interface IBlogPostCommentRepository
+    public interface IBlogPostCommentRepository : IBaseRepository<BlogPostComment>
     {
-        Task<BlogPostComment> AddAsync(BlogPostComment blogPostComment);
+
 
         Task<IEnumerable<BlogPostComment>> GetCommentsByBlogIDAsync(Guid blogPostID);
     }

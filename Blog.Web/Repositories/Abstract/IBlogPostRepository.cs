@@ -2,13 +2,15 @@
 
 namespace Blog.Web.Repositories.Abstract
 {
-    public interface IBlogPostRepository
+    public interface IBlogPostRepository : IBaseRepository<BlogPost>
     {
-        Task<IEnumerable<BlogPost>> GetAllAsync();
-        Task<BlogPost?> GetAsync(Guid id);
-        Task<BlogPost?> GetByUrlHandleAsync(string urlHandle);
-        Task<BlogPost> AddAsync(BlogPost blogPost);
-        Task<BlogPost?> UpdateAsync(BlogPost blogPost);
-        Task<BlogPost?> DeleteAsync(Guid id);
+        //Task<IEnumerable<BlogPost>> GetAllAsync();
+
+
+        //Task<BlogPost?> GetAsync(Guid id);
+        //Task<BlogPost?> GetByUrlHandleAsync(string urlHandle);
+        //Task<BlogPost> AddAsync(BlogPost blogPost);
+        //Task<BlogPost?> UpdateAsync(BlogPost blogPost);
+        //Task<BlogPost?> DeleteAsync(Guid id);
     }
 }

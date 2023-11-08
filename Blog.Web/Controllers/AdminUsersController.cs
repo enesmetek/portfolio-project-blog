@@ -1,27 +1,28 @@
-﻿using Blog.Web.Models.ViewModels;
-using Blog.Web.Repositories.Abstract;
+﻿using Blog.Web.Models.Domain;
+using Blog.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Web.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdminUsersController : Controller
     {
-        private readonly IUserRepository userRepository;
-        private readonly UserManager<IdentityUser> userManager;
 
-        public AdminUsersController(IUserRepository userRepository, UserManager<IdentityUser> userManager)
+        private readonly UserManager<BlogUser> userManager;
+
+        public AdminUsersController(UserManager<BlogUser> userRepository, UserManager<BlogUser> userManager)
         {
-            this.userRepository = userRepository;
+
             this.userManager = userManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var users = await userRepository.GetAll();
+            var users = await userManager.Users.ToListAsync();
 
             var usersViewModel = new UserViewModel();
             usersViewModel.Users = new List<User>();
@@ -42,7 +43,7 @@ namespace Blog.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> List(UserViewModel userViewModel)
         {
-            var identityUser = new IdentityUser
+            var identityUser = new BlogUser
             {
                 UserName = userViewModel.Username,
                 Email = userViewModel.Email
@@ -50,9 +51,9 @@ namespace Blog.Web.Controllers
 
             var identityResult = await userManager.CreateAsync(identityUser, userViewModel.Password);
 
-            if(identityResult != null)
+            if (identityResult != null)
             {
-                if(identityResult.Succeeded)
+                if (identityResult.Succeeded)
                 {
                     var roles = new List<string> { "User" };
 
@@ -78,7 +79,7 @@ namespace Blog.Web.Controllers
         {
             var user = await userManager.FindByIdAsync(id.ToString());
 
-            if(user != null)
+            if (user != null)
             {
                 var identityResult = await userManager.DeleteAsync(user);
 
@@ -88,8 +89,8 @@ namespace Blog.Web.Controllers
                 }
             }
 
-            return View( );
-            
+            return View();
+
         }
     }
 }

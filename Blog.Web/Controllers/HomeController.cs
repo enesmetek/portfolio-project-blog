@@ -1,9 +1,8 @@
 ﻿using Blog.Web.Models;
+using Blog.Web.Models.ViewModels;
+using Blog.Web.Repositories.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Blog.Web.Repositories;
-using Blog.Web.Repositories.Abstract;
-using Blog.Web.Models.ViewModels;
 
 namespace Blog.Web.Controllers
 {

@@ -1,11 +1,8 @@
-﻿using Azure;
-using Blog.Web.Data;
-using Blog.Web.Models.Domain;
+﻿using Blog.Web.Models.Domain;
 using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Web.Controllers
 {
@@ -35,7 +32,7 @@ namespace Blog.Web.Controllers
                 DisplayName = addTagRequest.DisplayName,
             };
 
-            await _tagRepository.AddAsync(tag);
+            await _tagRepository.InsertAsync(tag);
 
             return RedirectToAction("List");
         }
@@ -52,7 +49,7 @@ namespace Blog.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var tag = await _tagRepository.GetAsync(id);
+            var tag = await _tagRepository.GetByIdAsync(id.ToString());
 
             if (tag != null)
             {
@@ -68,7 +65,7 @@ namespace Blog.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EditTagRequest editTagRequest) 
+        public async Task<IActionResult> Edit(EditTagRequest editTagRequest)
         {
             var tag = new Tag
             {
@@ -78,7 +75,7 @@ namespace Blog.Web.Controllers
             };
 
             var updatedTag = await _tagRepository.UpdateAsync(tag);
-            if(updatedTag != null)
+            if (updatedTag != null)
             {
                 //Show Success Notification
             }
@@ -86,14 +83,16 @@ namespace Blog.Web.Controllers
             {
                 //Show Error Notification
             }
-            return RedirectToAction("Edit", new { id = editTagRequest.ID});
+            return RedirectToAction("Edit", new { id = editTagRequest.ID });
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(EditTagRequest editTagRequest)
         {
-            var deletedTag = await _tagRepository.DeleteAsync(editTagRequest.ID);
-            if(deletedTag != null)
+
+            var dtag = await _tagRepository.GetByIdAsync(editTagRequest.ID.ToString());
+            var deletedTag = await _tagRepository.DeleteAsync(dtag);
+            if (deletedTag != null)
             {
                 //Show Success Notification
                 return RedirectToAction("List");

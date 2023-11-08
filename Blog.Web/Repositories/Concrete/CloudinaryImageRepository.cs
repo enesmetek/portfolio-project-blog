@@ -31,7 +31,7 @@ namespace Blog.Web.Repositories.Concrete
 
             var uploadResult = await client.UploadAsync(uploadParams);
 
-            if(uploadResult != null && uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+            if (uploadResult != null && uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return uploadResult.SecureUri.ToString();
             }

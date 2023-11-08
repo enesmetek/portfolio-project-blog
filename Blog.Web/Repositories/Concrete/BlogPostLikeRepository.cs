@@ -1,34 +1,33 @@
-﻿using Blog.Web.Data;
-using Blog.Web.Models.Domain;
+﻿using Blog.Web.Models.Domain;
 using Blog.Web.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Web.Repositories.Concrete
 {
-    public class BlogPostLikeRepository : IBlogPostLikeRepository
+    public class BlogPostLikeRepository : BaseRepository<BlogPostLike>, IBlogPostLikeRepository
     {
-        private readonly BlogDbContext blogDbContext;
 
-        public BlogPostLikeRepository(BlogDbContext blogDbContext)
+
+        public BlogPostLikeRepository()
         {
-            this.blogDbContext = blogDbContext;
+
         }
 
         public async Task<BlogPostLike> AddLikeForBlog(BlogPostLike blogPostLike)
         {
-            await blogDbContext.BlogPostLike.AddAsync(blogPostLike);
-            await blogDbContext.SaveChangesAsync();
+            await base.dbContext.BlogPostLike.AddAsync(blogPostLike);
+            await base.dbContext.SaveChangesAsync();
             return blogPostLike;
         }
 
         public async Task<IEnumerable<BlogPostLike>> GetLikesForBlog(Guid blogPostID)
         {
-            return await blogDbContext.BlogPostLike.Where(x => x.BlogPostID == blogPostID).ToListAsync();
+            return await base.dbContext.BlogPostLike.Where(x => x.BlogPostID == blogPostID).ToListAsync();
         }
 
         public async Task<int> GetTotalLikes(Guid blogPostID)
         {
-            return await blogDbContext.BlogPostLike.CountAsync(x => x.BlogPostID == blogPostID);
+            return await base.dbContext.BlogPostLike.CountAsync(x => x.BlogPostID == blogPostID);
         }
     }
 }

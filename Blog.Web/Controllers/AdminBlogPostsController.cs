@@ -56,7 +56,7 @@ namespace Blog.Web.Controllers
             foreach (var selectedTagID in addBlogPostRequest.SelectedTags)
             {
                 var selectedTagIDAsGuid = Guid.Parse(selectedTagID);
-                var existingTag = await _tagRepository.GetAsync(selectedTagIDAsGuid);
+                var existingTag = await _tagRepository.GetByIdAsync(selectedTagIDAsGuid.ToString());
 
                 if (existingTag != null)
                 {
@@ -67,7 +67,7 @@ namespace Blog.Web.Controllers
             //Map tags back to Domain Model
             blogPost.Tags = selectedTags;
 
-            await _blogPostRepository.AddAsync(blogPost);
+            await _blogPostRepository.InsertAsync(blogPost);
             return RedirectToAction("List");
         }
 
@@ -82,7 +82,7 @@ namespace Blog.Web.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var blogPost = await _blogPostRepository.GetAsync(id);
+            var blogPost = await _blogPostRepository.GetByIdAsync(id.ToString());
             var tagsDomainModel = await _tagRepository.GetAllAsync();
 
             if (blogPost != null)
@@ -134,7 +134,7 @@ namespace Blog.Web.Controllers
             {
                 if (Guid.TryParse(selectedTag, out var tag))
                 {
-                    var foundTag = await _tagRepository.GetAsync(tag);
+                    var foundTag = await _tagRepository.GetByIdAsync(tag.ToString());
 
                     if (foundTag != null)
                     {
@@ -162,7 +162,8 @@ namespace Blog.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(EditBlogPostRequest editBlogPostRequest)
         {
-            var deletedBlogPost = await _blogPostRepository.DeleteAsync(editBlogPostRequest.ID);
+            var dPost = await _blogPostRepository.GetByIdAsync(editBlogPostRequest.ID.ToString());
+            var deletedBlogPost = await _blogPostRepository.DeleteAsync(dPost);
             if (deletedBlogPost != null)
             {
                 //Show Success Notification

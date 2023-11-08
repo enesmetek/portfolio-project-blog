@@ -15,6 +15,11 @@ namespace Blog.Web.Data
         public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
         {
         }
+
+        public BlogDbContext()
+        {
+
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BloggieDb;Trusted_Connection=True;TrustServerCertificate=True");
