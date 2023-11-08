@@ -1,8 +1,8 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using Blog.Web.Models.Domain;
 
-namespace Blog.Web.Models.Domain
+namespace Blog.Web.Models.ViewModels
 {
-    public class BlogPost
+    public class BlogDetailsViewModel
     {
         public Guid ID { get; set; }
         public string Heading { get; set; }
@@ -14,11 +14,11 @@ namespace Blog.Web.Models.Domain
         public DateTime PublishedDate { get; set; }
         public string Author { get; set; }
         public bool Visible { get; set; }
-
-        //Navigation Properties
         public ICollection<Tag> Tags { get; set; }
+        public int TotalLikes { get; set; }
+        public bool Liked { get; set; }
+        public string CommentDescription { get; set; }
+        public IEnumerable<BlogComment> Comments { get; set; }
 
-        public ICollection<BlogPostLike>? Likes { get; set; }
-        public ICollection<BlogPostComment>? Comments { get; set; }
     }
 }
