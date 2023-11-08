@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Blog.Web.Models.Domain
+﻿namespace Blog.Web.Models.Domain
 {
     public class BlogPost
     {
@@ -12,7 +10,8 @@ namespace Blog.Web.Models.Domain
         public string FeaturedImageUrl { get; set; }
         public string UrlHandle { get; set; }
         public DateTime PublishedDate { get; set; }
-        public string Author { get; set; }
+        public string BlogUserId { get; set; }
+        public BlogUser BlogUser { get; set; }
         public bool Visible { get; set; }
 
         //Navigation Properties

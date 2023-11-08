@@ -7,9 +7,9 @@ namespace Blog.Web.Repositories.Concrete
 {
     public class UserRepository : IUserRepository
     {
-        private readonly AuthDbContext authDbContext;
+        private readonly BlogDbContext authDbContext;
 
-        public UserRepository(AuthDbContext authDbContext)
+        public UserRepository(BlogDbContext authDbContext)
         {
             this.authDbContext = authDbContext;
         }

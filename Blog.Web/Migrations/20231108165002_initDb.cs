@@ -1,14 +1,13 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Blog.Web.Migrations.AuthDb
+namespace Blog.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatingAuthDB : Migration
+    public partial class initDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,6 +31,7 @@ namespace Blog.Web.Migrations.AuthDb
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -53,6 +53,19 @@ namespace Blog.Web.Migrations.AuthDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -70,7 +83,7 @@ namespace Blog.Web.Migrations.AuthDb
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -91,7 +104,7 @@ namespace Blog.Web.Migrations.AuthDb
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,7 +124,7 @@ namespace Blog.Web.Migrations.AuthDb
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -129,13 +142,13 @@ namespace Blog.Web.Migrations.AuthDb
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -155,7 +168,109 @@ namespace Blog.Web.Migrations.AuthDb
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlogPosts",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Heading = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PageTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FeaturedImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UrlHandle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BlogUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Visible = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogPosts", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_BlogPosts_AspNetUsers_BlogUserId",
+                        column: x => x.BlogUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlogPostComment",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BlogPostID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BlogUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogPostComment", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_BlogPostComment_AspNetUsers_BlogUserId",
+                        column: x => x.BlogUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BlogPostComment_BlogPosts_BlogPostID",
+                        column: x => x.BlogPostID,
+                        principalTable: "BlogPosts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlogPostLike",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BlogPostID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BlogUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogPostLike", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_BlogPostLike_AspNetUsers_BlogUserId",
+                        column: x => x.BlogUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BlogPostLike_BlogPosts_BlogPostID",
+                        column: x => x.BlogPostID,
+                        principalTable: "BlogPosts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlogPostTag",
+                columns: table => new
+                {
+                    BlogPostsID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TagsID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogPostTag", x => new { x.BlogPostsID, x.TagsID });
+                    table.ForeignKey(
+                        name: "FK_BlogPostTag_BlogPosts_BlogPostsID",
+                        column: x => x.BlogPostsID,
+                        principalTable: "BlogPosts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BlogPostTag_Tags_TagsID",
+                        column: x => x.TagsID,
+                        principalTable: "Tags",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -170,8 +285,8 @@ namespace Blog.Web.Migrations.AuthDb
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "d121069c-aba5-44be-a238-84ebfaa8ee00", 0, "03c94d42-b660-4afe-8dc4-27b5a62dd92d", "superadmin@bloggie.com", false, false, null, "SUPERADMIN@BLOGGIE.COM", "SUPERADMIN@BLOGGIE.COM", "AQAAAAIAAYagAAAAEJ8rlwJTBaEeV729q4g814LUsB/xqzokajvPz4Vvn7XFVCZ3OVaSrsBx2r6W37Qn5A==", null, false, "ea8d0c34-cea7-4488-b1f8-38a3371a2b9b", false, "superadmin@bloggie.com" });
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Discriminator", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "d121069c-aba5-44be-a238-84ebfaa8ee00", 0, "4c3dea7c-4d3a-4517-894d-161b25e36da8", "BlogUser", "superadmin@bloggie.com", false, false, null, "SUPERADMİN@BLOGGİE.COM", "SUPERADMİN@BLOGGİE.COM", "AQAAAAIAAYagAAAAEETV9qywalgXHjA7CyauU41zg3Qqwq3EXYsoj0QTIThwSrbpxvCCddBst2dnYm+c2g==", null, false, "84e0e742-8cb2-495e-836d-e7a37c877161", false, "superadmin@bloggie.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -221,6 +336,36 @@ namespace Blog.Web.Migrations.AuthDb
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPostComment_BlogPostID",
+                table: "BlogPostComment",
+                column: "BlogPostID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPostComment_BlogUserId",
+                table: "BlogPostComment",
+                column: "BlogUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPostLike_BlogPostID",
+                table: "BlogPostLike",
+                column: "BlogPostID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPostLike_BlogUserId",
+                table: "BlogPostLike",
+                column: "BlogUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPosts_BlogUserId",
+                table: "BlogPosts",
+                column: "BlogUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BlogPostTag_TagsID",
+                table: "BlogPostTag",
+                column: "TagsID");
         }
 
         /// <inheritdoc />
@@ -242,7 +387,22 @@ namespace Blog.Web.Migrations.AuthDb
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BlogPostComment");
+
+            migrationBuilder.DropTable(
+                name: "BlogPostLike");
+
+            migrationBuilder.DropTable(
+                name: "BlogPostTag");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "BlogPosts");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

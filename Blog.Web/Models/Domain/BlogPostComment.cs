@@ -5,7 +5,8 @@
         public Guid ID { get; set; }
         public string Description { get; set; }
         public Guid BlogPostID { get; set; }
-        public Guid UserID { get; set; }
+        public string BlogUserId { get; set; }
+        public BlogUser BlogUser { get; set; }
         public DateTime DateAdded { get; set; }
     }
 }

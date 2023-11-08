@@ -3,6 +3,7 @@ using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Blog.Web.Controllers
 {
@@ -10,14 +11,14 @@ namespace Blog.Web.Controllers
     {
         private readonly IBlogPostRepository blogPostRepository;
         private readonly IBlogPostLikeRepository blogPostLikeRepository;
-        private readonly SignInManager<IdentityUser> signInManager;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<BlogUser> signInManager;
+        private readonly UserManager<BlogUser> userManager;
         private readonly IBlogPostCommentRepository blogPostCommentRepository;
 
         public BlogsController(IBlogPostRepository blogPostRepository,
             IBlogPostLikeRepository blogPostLikeRepository,
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
+            SignInManager<BlogUser> signInManager,
+            UserManager<BlogUser> userManager,
             IBlogPostCommentRepository blogPostCommentRepository)
         {
             this.blogPostRepository = blogPostRepository;
@@ -38,8 +39,10 @@ namespace Blog.Web.Controllers
             {
                 var totalLikes = await blogPostLikeRepository.GetTotalLikes(blogPost.ID);
 
-                if(signInManager.IsSignedIn(User))
+                if (signInManager.IsSignedIn(User))
                 {
+
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                     //Get Like for this blog for this user
                     var likesForBlog = await blogPostLikeRepository.GetLikesForBlog(blogPost.ID);
 
@@ -47,7 +50,7 @@ namespace Blog.Web.Controllers
 
                     if (userID != null)
                     {
-                       var likeFromUser = likesForBlog.FirstOrDefault(x => x.UserID == Guid.Parse(userID));
+                        var likeFromUser = likesForBlog.FirstOrDefault(x => x.BlogUserId == userId);
                         liked = likeFromUser != null;
                     }
                 }
@@ -63,7 +66,7 @@ namespace Blog.Web.Controllers
                     {
                         Description = blogComment.Description,
                         DateAdded = blogComment.DateAdded,
-                        Username = (await userManager.FindByIdAsync(blogComment.UserID.ToString())).UserName
+                        Username = (await userManager.FindByIdAsync(blogComment.BlogUserId.ToString())).UserName
                     });
                 }
 
@@ -73,7 +76,7 @@ namespace Blog.Web.Controllers
                     ID = blogPost.ID,
                     Content = blogPost.Content,
                     PageTitle = blogPost.PageTitle,
-                    Author = blogPost.Author,
+                    //Author = blogPost.Author,
                     FeaturedImageUrl = blogPost.FeaturedImageUrl,
                     Heading = blogPost.Heading,
                     PublishedDate = blogPost.PublishedDate,
@@ -92,18 +95,20 @@ namespace Blog.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(BlogDetailsViewModel blogDetailsViewModel)
         {
-            if(signInManager.IsSignedIn(User))
+            if (signInManager.IsSignedIn(User))
             {
+
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var domainModel = new BlogPostComment
                 {
                     BlogPostID = blogDetailsViewModel.ID,
                     Description = blogDetailsViewModel.CommentDescription,
-                    UserID = Guid.Parse(userManager.GetUserId(User)),
+                    BlogUserId = userId,
                     DateAdded = DateTime.Now
                 };
 
                 await blogPostCommentRepository.AddAsync(domainModel);
-                return RedirectToAction("Index", "Home", 
+                return RedirectToAction("Index", "Home",
                     new { urlHandle = blogDetailsViewModel.UrlHandle });
             }
 

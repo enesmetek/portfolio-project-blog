@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Blog.Web.Migrations.AuthDb
+namespace Blog.Web.Migrations
 {
-    [DbContext(typeof(AuthDbContext))]
-    [Migration("20231014174733_CreatingAuthDB")]
-    partial class CreatingAuthDB
+    [DbContext(typeof(BlogDbContext))]
+    [Migration("20231108165002_initDb")]
+    partial class initDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,138 @@ namespace Blog.Web.Migrations.AuthDb
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPost", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BlogUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeaturedImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShortDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UrlHandle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Visible")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BlogUserId");
+
+                    b.ToTable("BlogPosts");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPostComment", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlogPostID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BlogUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BlogPostID");
+
+                    b.HasIndex("BlogUserId");
+
+                    b.ToTable("BlogPostComment");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPostLike", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlogPostID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BlogUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BlogPostID");
+
+                    b.HasIndex("BlogUserId");
+
+                    b.ToTable("BlogPostLike");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.Tag", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("BlogPostTag", b =>
+                {
+                    b.Property<Guid>("BlogPostsID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TagsID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("BlogPostsID", "TagsID");
+
+                    b.HasIndex("TagsID");
+
+                    b.ToTable("BlogPostTag");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -112,6 +244,10 @@ namespace Blog.Web.Migrations.AuthDb
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -164,23 +300,9 @@ namespace Blog.Web.Migrations.AuthDb
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "d121069c-aba5-44be-a238-84ebfaa8ee00",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "03c94d42-b660-4afe-8dc4-27b5a62dd92d",
-                            Email = "superadmin@bloggie.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "SUPERADMIN@BLOGGIE.COM",
-                            NormalizedUserName = "SUPERADMIN@BLOGGIE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ8rlwJTBaEeV729q4g814LUsB/xqzokajvPz4Vvn7XFVCZ3OVaSrsBx2r6W37Qn5A==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "ea8d0c34-cea7-4488-b1f8-38a3371a2b9b",
-                            TwoFactorEnabled = false,
-                            UserName = "superadmin@bloggie.com"
-                        });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -281,6 +403,91 @@ namespace Blog.Web.Migrations.AuthDb
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.HasDiscriminator().HasValue("BlogUser");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "d121069c-aba5-44be-a238-84ebfaa8ee00",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "4c3dea7c-4d3a-4517-894d-161b25e36da8",
+                            Email = "superadmin@bloggie.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "SUPERADMİN@BLOGGİE.COM",
+                            NormalizedUserName = "SUPERADMİN@BLOGGİE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEETV9qywalgXHjA7CyauU41zg3Qqwq3EXYsoj0QTIThwSrbpxvCCddBst2dnYm+c2g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "84e0e742-8cb2-495e-836d-e7a37c877161",
+                            TwoFactorEnabled = false,
+                            UserName = "superadmin@bloggie.com"
+                        });
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPost", b =>
+                {
+                    b.HasOne("Blog.Web.Models.Domain.BlogUser", "BlogUser")
+                        .WithMany("Posts")
+                        .HasForeignKey("BlogUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlogUser");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPostComment", b =>
+                {
+                    b.HasOne("Blog.Web.Models.Domain.BlogPost", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("BlogPostID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Blog.Web.Models.Domain.BlogUser", "BlogUser")
+                        .WithMany("PostComments")
+                        .HasForeignKey("BlogUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlogUser");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPostLike", b =>
+                {
+                    b.HasOne("Blog.Web.Models.Domain.BlogPost", null)
+                        .WithMany("Likes")
+                        .HasForeignKey("BlogPostID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Blog.Web.Models.Domain.BlogUser", "BlogUser")
+                        .WithMany("Likes")
+                        .HasForeignKey("BlogUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlogUser");
+                });
+
+            modelBuilder.Entity("BlogPostTag", b =>
+                {
+                    b.HasOne("Blog.Web.Models.Domain.BlogPost", null)
+                        .WithMany()
+                        .HasForeignKey("BlogPostsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Blog.Web.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -330,6 +537,22 @@ namespace Blog.Web.Migrations.AuthDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogPost", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("Blog.Web.Models.Domain.BlogUser", b =>
+                {
+                    b.Navigation("Likes");
+
+                    b.Navigation("PostComments");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

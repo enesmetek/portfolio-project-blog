@@ -1,8 +1,8 @@
 ﻿using Blog.Web.Models.Domain;
 using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories.Abstract;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Blog.Web.Controllers
 {
@@ -21,10 +21,11 @@ namespace Blog.Web.Controllers
         [Route("Add")]
         public async Task<IActionResult> AddLike([FromBody] AddLikeRequest addLikeRequest)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var model = new BlogPostLike
             {
                 BlogPostID = addLikeRequest.BlogPostID,
-                UserID = addLikeRequest.UserID,
+                BlogUserId = userId
             };
 
             await blogPostLikeRepository.AddLikeForBlog(model);
@@ -35,7 +36,7 @@ namespace Blog.Web.Controllers
         [Route("{blogPostID:Guid}/totalLikes")]
         public async Task<IActionResult> GetTotalLikesForBlog([FromRoute] Guid blogPostID)
         {
-           var totalLikes = await blogPostLikeRepository.GetTotalLikes(blogPostID);
+            var totalLikes = await blogPostLikeRepository.GetTotalLikes(blogPostID);
             return Ok(totalLikes);
         }
     }

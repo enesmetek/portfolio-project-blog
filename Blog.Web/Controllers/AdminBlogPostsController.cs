@@ -1,11 +1,10 @@
-﻿using Blog.Web.Data;
-using Blog.Web.Models.Domain;
+﻿using Blog.Web.Models.Domain;
 using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Blog.Web.Controllers
 {
@@ -28,7 +27,7 @@ namespace Blog.Web.Controllers
 
             var model = new AddBlogPostRequest
             {
-                Tags = tags.Select(x => new SelectListItem { Text = x.Name, Value = x.ID.ToString()})
+                Tags = tags.Select(x => new SelectListItem { Text = x.Name, Value = x.ID.ToString() })
             };
 
             return View(model);
@@ -37,6 +36,7 @@ namespace Blog.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddBlogPostRequest addBlogPostRequest)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //Map View Model to Domain Model
             var blogPost = new BlogPost
             {
@@ -47,13 +47,13 @@ namespace Blog.Web.Controllers
                 FeaturedImageUrl = addBlogPostRequest.FeaturedImageUrl,
                 UrlHandle = addBlogPostRequest.UrlHandle,
                 PublishedDate = addBlogPostRequest.PublishedDate,
-                Author = addBlogPostRequest.Author,
+                BlogUserId = userId,
                 Visible = addBlogPostRequest.Visible
             };
 
             //Map Tags from Selected Tags
             var selectedTags = new List<Tag>();
-            foreach(var selectedTagID in addBlogPostRequest.SelectedTags)
+            foreach (var selectedTagID in addBlogPostRequest.SelectedTags)
             {
                 var selectedTagIDAsGuid = Guid.Parse(selectedTagID);
                 var existingTag = await _tagRepository.GetAsync(selectedTagIDAsGuid);
@@ -81,10 +81,11 @@ namespace Blog.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var blogPost = await _blogPostRepository.GetAsync(id);
             var tagsDomainModel = await _tagRepository.GetAllAsync();
 
-            if(blogPost != null)
+            if (blogPost != null)
             {
                 var model = new EditBlogPostRequest
                 {
@@ -96,7 +97,7 @@ namespace Blog.Web.Controllers
                     FeaturedImageUrl = blogPost.FeaturedImageUrl,
                     UrlHandle = blogPost.UrlHandle,
                     PublishedDate = blogPost.PublishedDate,
-                    Author = blogPost.Author,
+                    //Author = blogPost.Author,
                     Visible = blogPost.Visible,
                     Tags = tagsDomainModel.Select(x => new SelectListItem
                     {
@@ -124,7 +125,7 @@ namespace Blog.Web.Controllers
                 FeaturedImageUrl = editBlogPostRequest.FeaturedImageUrl,
                 UrlHandle = editBlogPostRequest.UrlHandle,
                 PublishedDate = editBlogPostRequest.PublishedDate,
-                Author = editBlogPostRequest.Author,
+                //Author = editBlogPostRequest.Author,
                 Visible = editBlogPostRequest.Visible,
             };
 
@@ -146,7 +147,7 @@ namespace Blog.Web.Controllers
 
             var updatedBlog = await _blogPostRepository.UpdateAsync(blogPostDomainModel);
 
-            if(updatedBlog != null)
+            if (updatedBlog != null)
             {
                 //Show Success Notification
                 return RedirectToAction("Edit");
@@ -170,7 +171,7 @@ namespace Blog.Web.Controllers
             else
             {
                 //Show Error Notification
-                return RedirectToAction("Edit", new { id = editBlogPostRequest.ID});
+                return RedirectToAction("Edit", new { id = editBlogPostRequest.ID });
             }
         }
     }

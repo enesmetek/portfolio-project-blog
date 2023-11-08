@@ -1,4 +1,5 @@
 using Blog.Web.Data;
+using Blog.Web.Models.Domain;
 using Blog.Web.Repositories.Abstract;
 using Blog.Web.Repositories.Concrete;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +13,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BlogDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("BlogDBCS")));
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("BloggieAuthDBCS")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AuthDbContext>();
+
+builder.Services.AddIdentity<BlogUser, IdentityRole>().AddEntityFrameworkStores<BlogDbContext>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
