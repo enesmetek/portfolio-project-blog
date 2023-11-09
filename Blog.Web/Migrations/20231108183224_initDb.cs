@@ -31,7 +31,6 @@ namespace Blog.Web.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -285,8 +284,8 @@ namespace Blog.Web.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Discriminator", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "d121069c-aba5-44be-a238-84ebfaa8ee00", 0, "4c3dea7c-4d3a-4517-894d-161b25e36da8", "BlogUser", "superadmin@bloggie.com", false, false, null, "SUPERADMİN@BLOGGİE.COM", "SUPERADMİN@BLOGGİE.COM", "AQAAAAIAAYagAAAAEETV9qywalgXHjA7CyauU41zg3Qqwq3EXYsoj0QTIThwSrbpxvCCddBst2dnYm+c2g==", null, false, "84e0e742-8cb2-495e-836d-e7a37c877161", false, "superadmin@bloggie.com" });
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "d121069c-aba5-44be-a238-84ebfaa8ee00", 0, "6d6adafe-5b72-4162-95b5-657766f4b9a7", "superadmin@bloggie.com", false, false, null, "SUPERADMİN@BLOGGİE.COM", "SUPERADMİN@BLOGGİE.COM", "AQAAAAIAAYagAAAAELEnLVjlyuSugXhD7jdvbnko1H03dAidc/k8PxoOWUnqB8Pswxz86UmicfMCnOjXNg==", null, false, "f51edc3f-1174-44ed-b08e-22f4118ee843", false, "superadmin@bloggie.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

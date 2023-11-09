@@ -107,7 +107,7 @@ namespace Blog.Web.Controllers
                     DateAdded = DateTime.Now
                 };
 
-                await blogPostCommentRepository.AddAsync(domainModel);
+                await blogPostCommentRepository.InsertAsync(domainModel);
                 return RedirectToAction("Index", "Home",
                     new { urlHandle = blogDetailsViewModel.UrlHandle });
             }
